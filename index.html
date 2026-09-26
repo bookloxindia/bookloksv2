@@ -1,1 +1,130 @@
-<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=app/"><script>location.replace("app/");</script></head><body><a href="app/">Open BookLoks</a></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BookLoks - Learn, Play, Earn, Build</title>
+    
+    <!-- Complete Meta OG Tags -->
+    <meta property="og:title" content="BookLoks Learning App">
+    <meta property="og:description" content="Gamified learning for Class 4 children. Learn, Play, Earn, and Build your dream home!">
+    <meta property="og:image" content="https://yourdomain.com/bookloks-logo.webp">
+    <meta property="og:url" content="https://yourdomain.com">
+    <meta property="og:type" content="website">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="data/manifest.json">
+    <meta name="theme-color" content="#4CAF50">
+    <link rel="icon" href="data/New folder/Bookloks favicon.png" type="image/png">
+    
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Audio Elements -->
+    <audio id="bg-music" src="data/New folder/background music.mp3" loop></audio>
+    <audio id="success-sound" src="data/New folder/4 or 5 right question applause music after succesful mission.mp3"></audio>
+    <audio id="fail-sound" src="data/New folder/1.2.3 question better luck next time music after failed mission.mp3"></audio>
+
+    <!-- App Container -->
+    <div id="app-container">
+        
+        <!-- 1. Home Screen -->
+        <section id="screen-home" class="screen active">
+            <header>
+                <div class="user-profile">
+                    <img src="assets/avatar-boy.png" alt="Avatar" class="avatar">
+                    <h2>Hi, Player!</h2>
+                    <p>Level 3</p>
+                </div>
+                <div class="stats">
+                    <span class="xp">🌟 450 XP</span>
+                    <span class="coins">🪙 120 Coins</span>
+                </div>
+            </header>
+            <main>
+                <button id="btn-continue-mission" class="btn-primary" onclick="navigate('screen-subjects')">CONTINUE MISSION</button>
+                <div class="quick-links">
+                    <button class="btn-secondary" onclick="navigate('screen-home-build')">MY HOME</button>
+                    <button class="btn-secondary">MAP</button>
+                </div>
+            </main>
+        </section>
+
+        <!-- 2. Subject Selection -->
+        <section id="screen-subjects" class="screen hidden">
+            <h2>Select Subject</h2>
+            <div class="grid-container" id="subject-list">
+                <!-- Populated via JS -->
+            </div>
+            <button class="btn-back" onclick="navigate('screen-home')">Back</button>
+        </section>
+
+        <!-- 3. Chapter Selection -->
+        <section id="screen-chapters" class="screen hidden">
+            <h2 id="current-subject-title">Subject</h2>
+            <div class="list-container" id="chapter-list">
+                <!-- Populated via JSON -->
+            </div>
+            <button class="btn-back" onclick="navigate('screen-subjects')">Back</button>
+        </section>
+
+        <!-- 4. Quick Check Screen -->
+        <section id="screen-quick-check" class="screen hidden">
+            <h2>Quick Check</h2>
+            <p>Pick 3 cards that belong to this chapter.</p>
+            <div class="cards-grid" id="quick-check-cards">
+                <!-- Populated via JSON -->
+            </div>
+            <div id="quick-check-explanation" class="hidden">
+                <p id="explanation-text"></p>
+                <button class="btn-primary" onclick="navigate('screen-mission')">START MISSION</button>
+            </div>
+        </section>
+
+        <!-- 5. Main Mission (Game) -->
+        <section id="screen-mission" class="screen hidden landscape-only">
+            <h2>Mission in Progress...</h2>
+            <div id="game-canvas">
+                <!-- Phaser/Game rendering area -->
+                <p>Game is running here.</p>
+            </div>
+            <button class="btn-primary" onclick="navigate('screen-quiz')">FINISH MISSION</button>
+        </section>
+
+        <!-- 6. Quiz Screen (Portrait) -->
+        <section id="screen-quiz" class="screen hidden portrait-only">
+            <h2>Chapter Quiz</h2>
+            <div id="question-container">
+                <h3 id="question-text">Question goes here?</h3>
+                <div id="options-container" class="options-grid">
+                    <!-- Options -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. Reward Screen -->
+        <section id="screen-reward" class="screen hidden">
+            <h2 id="reward-title">TREASURE FOUND!</h2>
+            <div class="reward-animation">🎉</div>
+            <div class="stats-earned">
+                <span id="earned-xp">+50 XP</span>
+                <span id="earned-coins">+20 Coins</span>
+            </div>
+            <button class="btn-primary" onclick="navigate('screen-home-build')">BUILD MY HOME</button>
+        </section>
+
+        <!-- 8. Build Home -->
+        <section id="screen-home-build" class="screen hidden landscape-only">
+            <h2>My Home</h2>
+            <div class="rooms-container">
+                <div class="room" id="living-room">Living Room</div>
+                <div class="room" id="play-room">Play Room</div>
+            </div>
+            <button class="btn-back" onclick="navigate('screen-home')">Back to Hub</button>
+        </section>
+
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
