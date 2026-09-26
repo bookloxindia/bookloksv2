@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BookLoks - Learn, Play, Earn, Build</title>
+    <title>BookLoks - Home</title>
     
     <!-- Complete Master Meta OG Tags -->
     <meta property="og:title" content="BookLoks Learning App">
@@ -14,489 +14,254 @@
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="data/manifest.json">
-    <meta name="theme-color" content="#4CAF50">
+    <meta name="theme-color" content="#fff5e6">
     <link rel="icon" href="data/New folder/Bookloks favicon.png" type="image/png">
     
     <style>
-        /* =========================================
-           MASTER CSS STRUCTURE
-           ========================================= */
+        /* --- BASE STYLES --- */
         :root {
-            --primary: #4CAF50;
-            --secondary: #FF9800;
-            --bg: #E8F5E9;
-            --text: #333;
-            --card-bg: #FFFFFF;
+            --bg-color: #fff9f0;
+            --card-bg: #ffffff;
+            --text-main: #333333;
+            --text-light: #666666;
+            --primary-green: #34A853;
+            --primary-blue: #4285F4;
+            --primary-orange: #FB8C00;
+            --accent-yellow: #FFC107;
         }
 
-        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
         
         body {
-            margin: 0; padding: 0;
-            background-color: var(--bg);
-            color: var(--text);
+            background-color: var(--bg-color);
+            color: var(--text-main);
             overflow-x: hidden;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .hidden { display: none !important; }
-        .active { display: flex; flex-direction: column; height: 100vh; }
-
-        header {
-            background: var(--primary); padding: 15px; color: white;
-            display: flex; justify-content: space-between; align-items: center;
+        /* --- SPLASH SCREEN --- */
+        #splash-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease-out;
         }
 
-        .stats span { margin-left: 15px; font-weight: bold; background: rgba(0,0,0,0.2); padding: 5px 10px; border-radius: 10px; }
-
-        main { flex: 1; padding: 20px; text-align: center; overflow-y: auto; }
-
-        button {
-            border: none; border-radius: 16px; padding: 15px 30px;
-            font-size: 18px; font-weight: bold; cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin: 10px;
-            transition: transform 0.1s;
+        /* --- APP CONTAINER --- */
+        #app-container {
+            display: none; /* Hidden until splash finishes */
+            flex-direction: column;
+            height: 100vh;
+            padding-bottom: 70px; /* Space for bottom nav */
+            overflow-y: auto;
         }
-        button:active { transform: scale(0.95); }
+
+        /* --- HEADER --- */
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+        }
+        .top-header img.logo { height: 40px; }
+        .header-icons span { font-size: 24px; margin-left: 15px; color: #d32f2f; cursor: pointer; }
+
+        /* --- PROFILE CARD --- */
+        .profile-card {
+            background: var(--card-bg);
+            margin: 0 20px 15px 20px;
+            padding: 15px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        .profile-card img.avatar {
+            width: 60px; height: 60px;
+            border-radius: 50%;
+            margin-right: 15px;
+            border: 3px solid #ffcc80;
+        }
+        .profile-info h2 { font-size: 18px; margin-bottom: 2px; }
+        .profile-info p { font-size: 12px; color: var(--text-light); margin-bottom: 8px; }
         
-        .btn-primary { background-color: var(--primary); color: white; }
-        .btn-secondary { background-color: var(--secondary); color: white; }
-        .btn-back { background-color: #9e9e9e; color: white; margin-top: 20px; }
-
-        /* Grids for Subjects and Chapters */
-        .grid-container {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;
+        .xp-bar-container {
+            display: flex; align-items: center; gap: 10px;
         }
-        .card {
-            background: var(--card-bg); border-radius: 20px; padding: 20px;
-            box-shadow: 0 8px 15px rgba(0,0,0,0.1); border: 2px solid #ddd;
+        .xp-bar {
+            width: 120px; height: 8px; background: #e0e0e0; border-radius: 4px; overflow: hidden;
         }
+        .xp-progress { width: 64%; height: 100%; background: #4CAF50; border-radius: 4px; }
+        .xp-text { font-size: 11px; font-weight: bold; }
 
-        /* Quick Check */
-        .qc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .qc-card { background: var(--secondary); padding: 20px; border-radius: 15px; color: white; font-weight: bold; }
-        .qc-card.selected-correct { background: #4CAF50 !important; }
-        .qc-card.shake { animation: shake 0.5s; background: #F44336 !important; }
-
-        @keyframes shake {
-            0% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            50% { transform: translateX(5px); }
-            75% { transform: translateX(-5px); }
-            100% { transform: translateX(0); }
+        .level-badge {
+            position: absolute; top: 15px; right: 15px;
+            background: #2b3a4a; color: white;
+            padding: 5px 10px; border-radius: 12px;
+            font-size: 12px; font-weight: bold;
         }
-
-        /* Quiz Options */
-        .quiz-option {
-            display: block; width: 100%; margin: 10px 0; padding: 15px;
-            background: white; border: 2px solid var(--primary);
-            border-radius: 10px; font-size: 18px; font-weight: bold;
+        .coins-badge {
+            position: absolute; bottom: 15px; right: 15px;
+            display: flex; align-items: center; gap: 5px;
+            font-size: 16px; font-weight: bold;
+        }
+        .coins-badge .add-btn {
+            background: #4285F4; color: white; border-radius: 50%;
+            width: 20px; height: 20px; display: inline-flex;
+            justify-content: center; align-items: center; font-size: 14px;
         }
 
-        /* Home Building */
-        .room-container {
-            width: 100%; height: 300px; background: #d7ccc8; border-radius: 15px;
-            position: relative; margin-bottom: 20px; border: 4px solid #8d6e63;
+        /* --- HERO ILLUSTRATION --- */
+        .hero-section {
+            margin: 0 20px 15px 20px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            position: relative;
+            height: 250px;
+            background: #e6cba8 url('path_to_your_3d_boy_image.jpg') center/cover no-repeat; /* Replace with actual image */
         }
-        .house-item {
-            position: absolute; font-size: 40px;
-        }
-        .store-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        .store-item { background: white; padding: 10px; border-radius: 10px; border: 2px solid #ddd; }
 
-        @media screen and (orientation: portrait) {
-            .landscape-only::before {
-                content: "Please rotate your phone to Landscape mode!";
-                font-size: 1.5rem; text-align: center; padding: 20px;
-                background: rgba(0,0,0,0.9); color: white;
-                position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-                z-index: 100; display: flex; align-items: center; justify-content: center;
-            }
+        /* --- ACTION BUTTONS --- */
+        .action-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin: 0 20px 20px 20px;
         }
+        .action-btn {
+            border-radius: 16px; padding: 15px 5px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: white; font-weight: bold; font-size: 13px; text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            border: none; cursor: pointer; transition: transform 0.1s;
+        }
+        .action-btn:active { transform: scale(0.95); }
+        .action-btn img { height: 35px; margin-bottom: 8px; }
+        
+        .btn-green { background: linear-gradient(145deg, #4cd964, #34a853); }
+        .btn-blue { background: linear-gradient(145deg, #64b5f6, #4285F4); }
+        .btn-orange { background: linear-gradient(145deg, #ff9800, #f57c00); }
+
+        /* --- BOTTOM NAV --- */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: white; border-top: 1px solid #eee;
+            display: flex; justify-content: space-around; padding: 10px 0;
+            z-index: 100;
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center;
+            color: #999; font-size: 11px; font-weight: 600; cursor: pointer;
+        }
+        .nav-item.active { color: #5e35b1; }
+        .nav-item span { font-size: 22px; margin-bottom: 3px; }
+
     </style>
 </head>
 <body>
-    <!-- Audio Elements -->
-    <audio id="bg-music" src="data/New folder/background music.mp3" loop></audio>
-    <audio id="success-sound" src="data/New folder/4 or 5 right question applause music after succesful mission.mp3"></audio>
-    <audio id="fail-sound" src="data/New folder/1.2.3 question better luck next time music after failed mission.mp3"></audio>
 
-    <div id="app-container">
-        <!-- 1. HOME SCREEN -->
-        <section id="screen-home" class="screen active">
-            <header>
-                <div><h2>Hi, Player!</h2><p>Level <span id="ui-level">1</span></p></div>
-                <div class="stats">
-                    <span>🌟 <span id="ui-xp">0</span> XP</span>
-                    <span>🪙 <span id="ui-coins">0</span></span>
-                </div>
-            </header>
-            <main>
-                <img src="data/New folder/Bookloks logo.webp" alt="BookLoks" style="width: 150px; margin-bottom: 20px;">
-                <br>
-                <button class="btn-primary" onclick="navigate('screen-subjects')">CONTINUE MISSION</button>
-                <br>
-                <button class="btn-secondary" onclick="navigate('screen-home-build')">MY HOME (BUILD)</button>
-            </main>
-        </section>
-
-        <!-- 2. SUBJECTS -->
-        <section id="screen-subjects" class="screen hidden">
-            <header><h2>Select Subject</h2></header>
-            <main>
-                <div class="grid-container" id="subject-list"></div>
-                <button class="btn-back" onclick="navigate('screen-home')">Back</button>
-            </main>
-        </section>
-
-        <!-- 3. CHAPTERS -->
-        <section id="screen-chapters" class="screen hidden">
-            <header><h2 id="current-subject-title">Chapters</h2></header>
-            <main>
-                <div class="grid-container" id="chapter-list"></div>
-                <button class="btn-back" onclick="navigate('screen-subjects')">Back</button>
-            </main>
-        </section>
-
-        <!-- 4. QUICK CHECK -->
-        <section id="screen-quick-check" class="screen hidden">
-            <header><h2>Quick Check</h2></header>
-            <main>
-                <p>Pick 3 cards that belong to this chapter.</p>
-                <div class="qc-grid" id="quick-check-cards"></div>
-                <div id="qc-explanation" class="hidden card" style="margin-top: 20px; border-color: var(--primary);">
-                    <p id="explanation-text"></p>
-                    <button class="btn-primary" onclick="navigate('screen-mission')">START MISSION</button>
-                </div>
-            </main>
-        </section>
-
-        <!-- 5. MISSION GAME (Landscape Placeholder) -->
-        <section id="screen-mission" class="screen hidden landscape-only">
-            <main style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                <h2>Mission In Progress...</h2>
-                <div style="width: 80%; height: 60%; background: #000; color: #fff; display: flex; align-items: center; justify-content: center; border-radius: 15px;">
-                    Game Canvas / Phaser Appears Here
-                </div>
-                <button class="btn-primary" onclick="startQuiz()">MISSION COMPLETE - START QUIZ</button>
-            </main>
-        </section>
-
-        <!-- 6. QUIZ -->
-        <section id="screen-quiz" class="screen hidden">
-            <header><h2>Chapter Quiz</h2><div class="stats">Q: <span id="quiz-progress">1/5</span></div></header>
-            <main>
-                <h3 id="question-text" style="font-size: 22px; margin-bottom: 30px;">Loading question...</h3>
-                <div id="options-container"></div>
-            </main>
-        </section>
-
-        <!-- 7. REWARD -->
-        <section id="screen-reward" class="screen hidden">
-            <main style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                <h1 id="reward-title" style="font-size: 36px; color: var(--secondary);"></h1>
-                <div id="reward-animation" style="font-size: 80px; margin: 20px 0;">🎁</div>
-                <h2>You Scored: <span id="final-score"></span>/5</h2>
-                <div class="card" style="font-size: 24px; margin-bottom: 20px;">
-                    <span style="color: var(--primary);">+<span id="earned-xp"></span> XP</span> | 
-                    <span style="color: var(--secondary);">+<span id="earned-coins"></span> Coins</span>
-                </div>
-                <button class="btn-primary" onclick="navigate('screen-home-build')">BUILD MY HOME</button>
-                <button class="btn-back" onclick="navigate('screen-home')">BACK TO HUB</button>
-            </main>
-        </section>
-
-        <!-- 8. BUILD HOME -->
-        <section id="screen-home-build" class="screen hidden landscape-only">
-            <header>
-                <h2>My Home - Living Room</h2>
-                <div class="stats"><span>🪙 <span id="build-coins">0</span></span></div>
-            </header>
-            <main style="display: flex; gap: 20px;">
-                <div class="room-container" id="living-room-canvas">
-                    <!-- Items appended here via JS -->
-                </div>
-                <div style="width: 300px; background: white; padding: 15px; border-radius: 15px; overflow-y: auto;">
-                    <h3>Store</h3>
-                    <div class="store-grid" id="store-items"></div>
-                </div>
-            </main>
-            <button class="btn-back" style="position: absolute; bottom: 20px; left: 20px;" onclick="navigate('screen-home')">Back</button>
-        </section>
+    <!-- Splash Screen -->
+    <div id="splash-screen">
+        <img src="data/New folder/Bookloks logo.webp" alt="BookLoks Logo" style="width: 200px;">
+        <h2 style="color: var(--text-main); margin-top: 20px;">Loading...</h2>
     </div>
 
-    <!-- =========================================
-         MASTER JAVASCRIPT LOGIC
-         ========================================= -->
+    <!-- Main App Container (Home Screen) -->
+    <div id="app-container">
+        
+        <!-- Top Bar -->
+        <div class="top-header">
+            <img src="data/New folder/Bookloks logo.webp" alt="BookLoks" class="logo">
+            <div class="header-icons">
+                <span>🔔</span>
+                <span>⚙️</span>
+            </div>
+        </div>
+
+        <!-- Profile Card -->
+        <div class="profile-card">
+            <img src="path_to_avatar.png" alt="User" class="avatar"> <!-- Update Image Path -->
+            <div class="profile-info">
+                <h2>Hi Gaurav!</h2>
+                <p>Ready for a new adventure?</p>
+                <div class="xp-bar-container">
+                    <span class="xp-text">320 / 500 XP</span>
+                    <div class="xp-bar"><div class="xp-progress"></div></div>
+                </div>
+            </div>
+            <div class="level-badge">👑 LV 3</div>
+            <div class="coins-badge">
+                🪙 85 <span class="add-btn">+</span>
+            </div>
+        </div>
+
+        <!-- Hero Illustration -->
+        <div class="hero-section">
+            <!-- Add the background image url in the CSS .hero-section class above -->
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-grid">
+            <button class="action-btn btn-green" onclick="goToSubjects()">
+                <span style="font-size: 24px; margin-bottom: 5px;">🎮</span>
+                Continue<br>My Mission →
+            </button>
+            <button class="action-btn btn-blue">
+                <span style="font-size: 24px; margin-bottom: 5px;">🗺️</span>
+                Explore<br>Map →
+            </button>
+            <button class="action-btn btn-orange">
+                <span style="font-size: 24px; margin-bottom: 5px;">🎁</span>
+                My Rewards<br>→
+            </button>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <div class="nav-item active">
+                <span>🏠</span> Home
+            </div>
+            <div class="nav-item">
+                <span>📖</span> Learn
+            </div>
+            <div class="nav-item">
+                <span>🛖</span> My Home
+            </div>
+            <div class="nav-item">
+                <span>🎒</span> Profile
+            </div>
+        </div>
+
+    </div>
+
     <script>
-        // --- GLOBAL STATE ---
-        let player = { xp: 0, coins: 50, level: 1, inventory: [] };
-        let currentSubject = '';
-        let currentChapterData = null;
-        let quizState = { questions: [], currentIndex: 0, score: 0 };
-        let qcState = { correctPicks: 0 };
-
-        // Play music on first interaction
-        document.body.addEventListener('click', () => {
-            const bgMusic = document.getElementById('bg-music');
-            if(bgMusic.paused) { bgMusic.volume = 0.1; bgMusic.play().catch(()=>{}); }
-        }, { once: true });
-
-        // Update UI stats
-        function updateStatsUI() {
-            document.getElementById('ui-xp').innerText = player.xp;
-            document.getElementById('ui-coins').innerText = player.coins;
-            document.getElementById('build-coins').innerText = player.coins;
-        }
-
-        function navigate(screenId) {
-            document.querySelectorAll('.screen').forEach(s => { s.classList.add('hidden'); s.classList.remove('active'); });
-            const target = document.getElementById(screenId);
-            target.classList.remove('hidden');
-            target.classList.add('active');
-            updateStatsUI();
-            if(screenId === 'screen-home-build') renderStore();
-        }
-
-        // --- SUBJECTS & CHAPTERS ---
-        const subjects = [
-            { id: 'maths', name: 'Mathematics' },
-            { id: 'science', name: 'Science' },
-            { id: 'social-studies', name: 'Social Studies' },
-            { id: 'english', name: 'English' },
-            { id: 'hindi', name: 'Hindi' },
-            { id: 'computer', name: 'Computer / IT' },
-            { id: 'olympiad', name: 'Maths Olympiad' }
-        ];
-
+        // Splash Screen Logic
         document.addEventListener('DOMContentLoaded', () => {
-            const container = document.getElementById('subject-list');
-            subjects.forEach(sub => {
-                const btn = document.createElement('div');
-                btn.className = 'card';
-                btn.innerHTML = `<h3>${sub.name}</h3><button class="btn-primary" onclick="loadChapters('${sub.id}', '${sub.name}')">SELECT</button>`;
-                container.appendChild(btn);
-            });
-            updateStatsUI();
+            setTimeout(() => {
+                const splash = document.getElementById('splash-screen');
+                const app = document.getElementById('app-container');
+                
+                splash.style.opacity = '0';
+                setTimeout(() => {
+                    splash.style.display = 'none';
+                    app.style.display = 'flex';
+                }, 500); // Wait for fade out transition
+            }, 2000); // 2 seconds splash duration
         });
 
-        async function loadChapters(subjectId, subjectName) {
-            document.getElementById('current-subject-title').innerText = subjectName;
-            const container = document.getElementById('chapter-list');
-            container.innerHTML = 'Loading chapters...';
-            navigate('screen-chapters');
-
-            try {
-                // Trying to fetch from uploaded data structure
-                const res = await fetch(`data/${subjectId}/ch01.json`);
-                const data = await res.json();
-                currentChapterData = data;
-                renderChapterCard(data);
-            } catch (e) {
-                console.log("JSON load failed, using fallback data");
-                currentChapterData = getFallbackChapterData(subjectName);
-                renderChapterCard(currentChapterData);
-            }
-        }
-
-        function renderChapterCard(data) {
-            const container = document.getElementById('chapter-list');
-            container.innerHTML = `
-                <div class="card" style="width: 100%; max-width: 400px; margin: 0 auto;">
-                    <h3>${data.chapter_title}</h3>
-                    <p>${data.chapter_summary}</p>
-                    <button class="btn-primary" onclick="startQuickCheck()">PLAY MISSION</button>
-                </div>
-            `;
-        }
-
-        // --- QUICK CHECK ---
-        function startQuickCheck() {
-            navigate('screen-quick-check');
-            qcState.correctPicks = 0;
-            document.getElementById('qc-explanation').classList.add('hidden');
-            
-            const qcData = currentChapterData.quick_check;
-            let allCards = [...qcData.correct_options, ...qcData.wrong_options];
-            allCards.sort(() => Math.random() - 0.5); // Shuffle
-
-            const container = document.getElementById('quick-check-cards');
-            container.innerHTML = '';
-
-            allCards.forEach(card => {
-                const btn = document.createElement('button');
-                btn.className = 'qc-card';
-                btn.innerText = card.text;
-                btn.onclick = () => handleQCClick(btn, card.isCorrect);
-                container.appendChild(btn);
-            });
-        }
-
-        function handleQCClick(btn, isCorrect) {
-            if (btn.classList.contains('selected-correct')) return;
-
-            if (isCorrect) {
-                btn.classList.add('selected-correct');
-                qcState.correctPicks++;
-                if (qcState.correctPicks === 3) {
-                    document.getElementById('explanation-text').innerText = currentChapterData.simple_explanation;
-                    document.getElementById('qc-explanation').classList.remove('hidden');
-                }
-            } else {
-                btn.classList.add('shake');
-                if(navigator.vibrate) navigator.vibrate(200);
-                setTimeout(() => btn.classList.remove('shake'), 500);
-            }
-        }
-
-        // --- QUIZ SYSTEM ---
-        function startQuiz() {
-            // Pick 5 random questions from chapter pool
-            let pool = [...currentChapterData.questions];
-            pool.sort(() => Math.random() - 0.5);
-            quizState.questions = pool.slice(0, 5);
-            quizState.currentIndex = 0;
-            quizState.score = 0;
-            navigate('screen-quiz');
-            renderQuestion();
-        }
-
-        function renderQuestion() {
-            const q = quizState.questions[quizState.currentIndex];
-            document.getElementById('quiz-progress').innerText = `${quizState.currentIndex + 1}/5`;
-            document.getElementById('question-text').innerText = q.q;
-            
-            const optContainer = document.getElementById('options-container');
-            optContainer.innerHTML = '';
-            
-            q.options.forEach((opt, index) => {
-                const btn = document.createElement('button');
-                btn.className = 'quiz-option';
-                btn.innerText = opt;
-                btn.onclick = () => handleAnswer(index === q.ansIndex);
-                optContainer.appendChild(btn);
-            });
-        }
-
-        function handleAnswer(isCorrect) {
-            if(isCorrect) quizState.score++;
-            quizState.currentIndex++;
-            
-            if(quizState.currentIndex < 5) {
-                renderQuestion();
-            } else {
-                showReward();
-            }
-        }
-
-        // --- REWARD SYSTEM ---
-        function showReward() {
-            navigate('screen-reward');
-            document.getElementById('final-score').innerText = quizState.score;
-            
-            let xpEarned = 0;
-            let coinsEarned = 0;
-            let title = "";
-
-            if(quizState.score >= 4) {
-                title = "TREASURE FOUND! 🎉";
-                xpEarned = 50; coinsEarned = 25;
-                document.getElementById('success-sound').play().catch(()=>{});
-                if(navigator.vibrate) navigator.vibrate([100, 50, 100]);
-            } else if (quizState.score >= 2) {
-                title = "GOOD JOB! 👍";
-                xpEarned = 20; coinsEarned = 10;
-            } else {
-                title = "NICE TRY! 💪";
-                xpEarned = 5; coinsEarned = 0;
-                document.getElementById('fail-sound').play().catch(()=>{});
-            }
-
-            document.getElementById('reward-title').innerText = title;
-            document.getElementById('earned-xp').innerText = xpEarned;
-            document.getElementById('earned-coins').innerText = coinsEarned;
-
-            player.xp += xpEarned;
-            player.coins += coinsEarned;
-            updateStatsUI();
-        }
-
-        // --- HOUSE BUILDING (Store Logic) ---
-        const storeItems = [
-            { id: 'sofa', name: 'Sofa', price: 20, icon: '🛋️', top: '150px', left: '100px' },
-            { id: 'tv', name: 'TV', price: 30, icon: '📺', top: '80px', left: '150px' },
-            { id: 'plant', name: 'Plant', price: 15, icon: '🪴', top: '150px', left: '20px' }
-        ];
-
-        function renderStore() {
-            const storeGrid = document.getElementById('store-items');
-            storeGrid.innerHTML = '';
-            
-            storeItems.forEach(item => {
-                if(!player.inventory.includes(item.id)) {
-                    const div = document.createElement('div');
-                    div.className = 'store-item';
-                    div.innerHTML = `
-                        <div style="font-size:30px">${item.icon}</div>
-                        <div style="font-size:12px">${item.name}</div>
-                        <button style="padding:5px 10px; font-size:12px; margin:5px 0; background: ${player.coins >= item.price ? 'var(--primary)' : '#999'}; color:white; border:none; border-radius:5px;" 
-                        onclick="buyItem('${item.id}')">${item.price} 🪙</button>
-                    `;
-                    storeGrid.appendChild(div);
-                }
-            });
-            renderRoom();
-        }
-
-        function buyItem(id) {
-            const item = storeItems.find(i => i.id === id);
-            if(player.coins >= item.price) {
-                player.coins -= item.price;
-                player.inventory.push(id);
-                updateStatsUI();
-                renderStore();
-            } else {
-                alert("Not enough coins! Play missions to earn more.");
-            }
-        }
-
-        function renderRoom() {
-            const room = document.getElementById('living-room-canvas');
-            room.innerHTML = '<div style="position:absolute; bottom:10px; width:100%; text-align:center; color:#5d4037; font-weight:bold;">LIVING ROOM</div>';
-            player.inventory.forEach(id => {
-                const item = storeItems.find(i => i.id === id);
-                const el = document.createElement('div');
-                el.className = 'house-item';
-                el.innerText = item.icon;
-                el.style.top = item.top;
-                el.style.left = item.left;
-                room.appendChild(el);
-            });
-        }
-
-        // --- FALLBACK DATA HELPER ---
-        function getFallbackChapterData(subject) {
-            return {
-                chapter_title: `Intro to ${subject}`,
-                chapter_summary: "Learn the basics and complete your mission to build your house!",
-                simple_explanation: "Awesome! You found the correct items. Let's start the mission.",
-                quick_check: {
-                    correct_options: [
-                        { text: "Correct 1", isCorrect: true }, { text: "Correct 2", isCorrect: true }, { text: "Correct 3", isCorrect: true }
-                    ],
-                    wrong_options: [
-                        { text: "Wrong 1", isCorrect: false }, { text: "Wrong 2", isCorrect: false }, { text: "Wrong 3", isCorrect: false }
-                    ]
-                },
-                questions: [
-                    { q: "What is 2 + 2?", options: ["3", "4", "5"], ansIndex: 1 },
-                    { q: "Which one is a living thing?", options: ["Rock", "Tree", "Car"], ansIndex: 1 },
-                    { q: "Capital of India?", options: ["Delhi", "Mumbai", "Pune"], ansIndex: 0 },
-                    { q: "Which shape has 4 equal sides?", options: ["Circle", "Square", "Triangle"], ansIndex: 1 },
-                    { q: "What do we drink?", options: ["Bread", "Water", "Sand"], ansIndex: 1 },
-                    { q: "Extra Question?", options: ["A", "B", "C"], ansIndex: 0 }
-                ]
-            };
+        // Navigation function for next step
+        function goToSubjects() {
+            console.log("Navigating to subjects...");
+            // Yahan hum next step ka logic add karenge (Subject Selection hide/show)
+            alert("Subject Selection Screen aayegi yahan!");
         }
     </script>
 </body>
